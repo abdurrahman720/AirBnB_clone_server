@@ -71,12 +71,23 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', async (req, res) => {
     const { token } = req.cookies;
-    jwt.verify(token, jwtSecret, {}, (err, data) => {
-        if (err) throw err
-        else {
-            res.json(data)
-        }
-    })
+    if (token) {
+        jwt.verify(token, jwtSecret, {},async (err, data) => {
+            if (err) throw err
+            else {
+            const {email, name, _id} = await User.findById(data.id)
+                res.json({email, name, _id})
+            }
+        })
+    }
+    else {
+        res.json(null)
+    }
+ 
+})
+
+app.post('/logout', async (req, res) => {
+    res.cookie('token', '').json(true);
 })
 
 
